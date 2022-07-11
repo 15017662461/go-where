@@ -1,6 +1,6 @@
 import { SearchWrapper } from "./style";
 import { useDispatch, useSelector } from "react-redux";
-import { getBillListAction } from "../../store/action";
+import { getBillListAction,getMinPrice } from "../../store/action";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import moment from "moment";
@@ -12,13 +12,6 @@ const Search = () => {
   const [sort, setsort] = useState(1);
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getBillListAction({ date: "2022-" + dataList[currentIndex], sort }));
-  }, [dataList, currentIndex, sort]);
-
-  const billList = useSelector((store) => {
-    return store.get("billList");
-  });
 
   useEffect(() => {
     let newDateList = [];
@@ -28,8 +21,25 @@ const Search = () => {
     setdatalist(newDateList);
   }, []);
 
+  useEffect(() => {
+    dispatch(getBillListAction({ date: "2022-" + dataList[currentIndex], sort }));
+  }, [dataList, currentIndex, sort]);
+
+  useEffect(() => {
+    console.log(dataList[currentIndex])
+    dispatch(getMinPrice({ date: "2022-" + dataList[currentIndex]}));
+  }, [dataList]);
+
+  const billList = useSelector((store) => {
+    return store.get("billList");
+  });
+
+  const minPrices = useSelector((store) => {
+    return store.get("minPrices");
+  });
+
   const dateBtn = (date, index) => {
-    dispatch(getBillListAction({ date, sort: 1 }));
+    dispatch(getBillListAction({ date:"2022-" + date, sort: 1 }));
     setcurrentIndex(index);
   };
 
@@ -44,8 +54,6 @@ const Search = () => {
 
   const [navtabShow, setnavtabShow] = useState(true);
 
-  const [arr, setarr] = useState([434, 554, 632, 357, 876, 1009]);
-
   const sortBnt = (index) => {
     if (sort === index) {
       setsort(-index);
@@ -53,7 +61,7 @@ const Search = () => {
       setsort(index);
     }
     console.log(sort);
-    dispatch(getBillListAction({ date: dataList[currentIndex], sort: index }));
+    dispatch(getBillListAction({ date: "2022-" + dataList[currentIndex], sort: index }));
   };
   const navigate = useNavigate();
   return (
@@ -82,16 +90,15 @@ const Search = () => {
               <div>
                 {moment().format("MM-DD") === item
                   ? "今天"
-                  : moment(item).format("dddd")}
+                  : moment("2022-" + item).format("dddd")}
               </div>
-              <div>￥{arr[index]}</div>
+              <div>￥{minPrices[index]}</div>
             </div>
           );
         })}
       </div>
       <div className="billList">
         {billList.map((item) => {
-          console.log(item);
           return (
             <div key={item.id} className="billItem">
               <div className="start">

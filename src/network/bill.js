@@ -7,3 +7,7 @@ export function getBill(data){
     data
   })
 }
+
+export function getMinPrices(data){
+  return request.get("minPrices",{params:data})
+}
